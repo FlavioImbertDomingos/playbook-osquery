@@ -1,0 +1,22 @@
+#### This playbook will install osquery and basic configuration and some FIM (File Integrity Management)  
+
+   - name: Step 1 - Setting up osquery
+     hosts: all
+     become: yes
+     tasks:
+       - name: Step 2 - Installing osquery
+         apt:
+           deb: https://pkg.osquery.io/deb/osquery_2.10.2_1.linux.amd64.deb
+           update_cache: yes
+       - name: Step 3 - Adding osquery configuration
+         template:
+           src: "{{ item.src }}"
+           dest: "{{ item.dst }}"
+         with_items:
+           - { src: fim.conf, dst: /usr/share/osquery/packs/fim.conf }
+           - { src: osquery.conf, dst: /etc/osquery/osquery.conf }
+       - name: Step - 4 Starting and enabling osquery service
+         service:
+           name: osqueryd
+           state: started
+           enabled: yes
